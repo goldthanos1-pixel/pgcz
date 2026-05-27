@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyGlass - 프리미엄 날씨 대시보드</title>
+    <!-- Google Fonts: Outfit & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.344.0/dist/umd/lucide.min.js"></script>
+</head>
+<body class="weather-clear-day"> <!-- 기본 배경 상태 -->
+    <div class="app-container">
+        <!-- 사이드바 (도시 검색 & 즐겨찾기) -->
+        <aside class="sidebar-panel">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="cloud-sun" class="logo-icon"></i>
+                    <h1>SkyGlass</h1>
+                </div>
+            </div>
+
+            <!-- 검색바 -->
+            <div class="search-box">
+                <i data-lucide="search" class="search-icon"></i>
+                <input type="text" id="city-input" placeholder="도시 검색 (예: 서울, New York)...">
+                <button id="search-btn" class="icon-btn">
+                    <i data-lucide="arrow-right"></i>
+                </button>
+            </div>
+
+            <!-- 인기/추천 도시 -->
+            <div class="sidebar-section">
+                <h3>주요 도시</h3>
+                <div class="quick-cities">
+                    <button class="quick-city-btn" data-city="Seoul">서울</button>
+                    <button class="quick-city-btn" data-city="Tokyo">도쿄</button>
+                    <button class="quick-city-btn" data-city="New York">뉴욕</button>
+                    <button class="quick-city-btn" data-city="London">런던</button>
+                    <button class="quick-city-btn" data-city="Paris">파리</button>
+                    <button class="quick-city-btn" data-city="Sydney">시드니</button>
+                </div>
+            </div>
+
+            <!-- 즐겨찾기 목록 -->
+            <div class="sidebar-section">
+                <div class="section-title-row">
+                    <h3>즐겨찾기</h3>
+                    <span class="favorites-count" id="fav-count">0</span>
+                </div>
+                <div class="favorites-list" id="favorites-container">
+                    <p class="empty-text">즐겨찾는 도시가 없습니다. 별 아이콘을 눌러 추가해 보세요.</p>
+                </div>
+            </div>
+
+            <!-- 사이드바 하단 제어 -->
+            <div class="sidebar-footer">
+                <button id="current-location-btn" class="footer-btn">
+                    <i data-lucide="map-pin"></i>
+                    <span>현재 위치 날씨</span>
+                </button>
+                <button id="open-settings-btn" class="footer-btn">
+                    <i data-lucide="settings"></i>
+                    <span>설정</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- 메인 대시보드 화면 -->
+        <main class="main-dashboard">
+            <!-- 상단 바 -->
+            <header class="dashboard-header">
+                <div class="location-info">
+                    <h2 id="current-city-name">서울</h2>
+                    <button id="toggle-favorite-btn" class="star-btn" title="즐겨찾기 추가/해제">
+                        <i data-lucide="star" class="star-icon"></i>
+                    </button>
+                    <span class="update-time" id="local-time">2026-05-28 01:30</span>
+                </div>
+                
+                <div class="header-controls">
+                    <!-- 섭씨/화씨 토글 스위치 -->
+                    <div class="unit-toggle-wrapper">
+                        <span class="unit-label">°C</span>
+                        <label class="switch">
+                            <input type="checkbox" id="unit-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                        <span class="unit-label">°F</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 메인 대시보드 레이아웃 그리드 -->
+            <div class="dashboard-grid">
+                
+                <!-- 1. 현재 날씨 메인 카드 (Glass 카드) -->
+                <section class="grid-card current-weather-card">
+                    <div class="weather-main-row">
+                        <div class="temp-display">
+                            <span class="temp-value" id="current-temp">22</span>
+                            <span class="temp-deg">°</span>
+                        </div>
+                        <div class="weather-status-wrapper">
+                            <div class="weather-icon-large" id="main-weather-icon-container">
+                                <i data-lucide="sun" class="weather-icon-anim"></i>
+                            </div>
+                            <span class="weather-desc" id="current-condition-text">맑음</span>
+                        </div>
+                    </div>
+                    <div class="weather-details-row">
+                        <div class="detail-item">
+                            <span class="label">체감 온도</span>
+                            <span class="value" id="feels-like-temp">21°</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">최저 기온</span>
+                            <span class="value" id="min-temp">17°</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">최고 기온</span>
+                            <span class="value" id="max-temp">25°</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. 24시간 예보 차트 카드 -->
+                <section class="grid-card forecast-chart-card">
+                    <div class="card-header">
+                        <h3>24시간 날씨 추이</h3>
+                        <div class="chart-tab-controls">
+                            <button class="chart-tab-btn active" data-type="temp">온도 (°C)</button>
+                            <button class="chart-tab-btn" data-type="rain">강수 확률 (%)</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="hourly-forecast-chart"></canvas>
+                    </div>
+                </section>
+
+                <!-- 3. 7일 예보 카드 -->
+                <section class="grid-card weekly-forecast-card">
+                    <div class="card-header">
+                        <h3>7일 날씨 예보</h3>
+                    </div>
+                    <div class="weekly-list" id="weekly-forecast-container">
+                        <!-- JS로 렌더링 -->
+                    </div>
+                </section>
+
+                <!-- 4. 상세 메트릭 그리드 -->
+                <div class="metrics-subgrid">
+                    
+                    <!-- 미세먼지(AQI) 카드 -->
+                    <article class="grid-card metric-card aqi-card">
+                        <div class="metric-header">
+                            <i data-lucide="wind" class="metric-icon"></i>
+                            <h4>미세먼지 (AQI)</h4>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-big-value" id="aqi-value">35</div>
+                            <div class="metric-status-badge aqi-badge-good" id="aqi-status">좋음</div>
+                        </div>
+                        <div class="aqi-bar-wrapper">
+                            <div class="aqi-bar">
+                                <div class="aqi-bar-fill" id="aqi-progress" style="width: 15%;"></div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- 바람 정보 카드 -->
+                    <article class="grid-card metric-card wind-card">
+                        <div class="metric-header">
+                            <i data-lucide="navigation" class="metric-icon"></i>
+                            <h4>풍속 & 풍향</h4>
+                        </div>
+                        <div class="metric-content wind-layout">
+                            <div class="wind-info">
+                                <div class="metric-big-value" id="wind-speed">3.2 <span class="sub-unit">m/s</span></div>
+                                <span class="wind-direction" id="wind-dir-text">남풍</span>
+                            </div>
+                            <div class="compass">
+                                <div class="compass-arrow" id="wind-compass-arrow" style="transform: rotate(180deg);"></div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- 자외선 지수 카드 -->
+                    <article class="grid-card metric-card uv-card">
+                        <div class="metric-header">
+                            <i data-lucide="sun-dim" class="metric-icon"></i>
+                            <h4>자외선 지수 (UV)</h4>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-big-value" id="uv-value">4.5</div>
+                            <div class="metric-status-badge uv-badge-normal" id="uv-status">보통</div>
+                        </div>
+                        <div class="uv-bar">
+                            <div class="uv-bar-indicator" id="uv-indicator" style="left: 45%;"></div>
+                        </div>
+                    </article>
+
+                    <!-- 일출 & 일몰 카드 -->
+                    <article class="grid-card metric-card sun-card">
+                        <div class="metric-header">
+                            <i data-lucide="sunset" class="metric-icon"></i>
+                            <h4>일출 & 일몰</h4>
+                        </div>
+                        <div class="sun-times-row">
+                            <div class="sun-time-box">
+                                <i data-lucide="sunrise" class="sun-icon sunrise"></i>
+                                <span class="time-label">일출</span>
+                                <span class="time-value" id="sunrise-time">06:12</span>
+                            </div>
+                            <div class="sun-time-box">
+                                <i data-lucide="sunset" class="sun-icon sunset"></i>
+                                <span class="time-label">일몰</span>
+                                <span class="time-value" id="sunset-time">18:45</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- 습도 카드 -->
+                    <article class="grid-card metric-card humidity-card">
+                        <div class="metric-header">
+                            <i data-lucide="droplet" class="metric-icon"></i>
+                            <h4>습도</h4>
+                        </div>
+                        <div class="metric-content">
+                            <div class="metric-big-value" id="humidity-value">65<span class="sub-unit">%</span></div>
+                            <p class="metric-helper-text" id="humidity-desc">쾌적한 상태입니다.</p>
+                        </div>
+                    </article>
+
+                    <!-- 기압 & 시정 카드 -->
+                    <article class="grid-card metric-card pressure-card">
+                        <div class="metric-header">
+                            <i data-lucide="gauge" class="metric-icon"></i>
+                            <h4>기압 & 시정</h4>
+                        </div>
+                        <div class="double-metric-row">
+                            <div class="half-metric">
+                                <span class="label">기압</span>
+                                <span class="value" id="pressure-value">1012 hPa</span>
+                            </div>
+                            <div class="half-metric border-left">
+                                <span class="label">시정</span>
+                                <span class="value" id="visibility-value">10 km</span>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- 설정 모달 -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h2>대시보드 설정</h2>
+                <button class="close-modal-btn" id="close-settings-btn">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="settings-intro">실시간 날씨를 연동하고 싶으시면 OpenWeatherMap API Key를 등록해 주세요. 비워둘 경우 정교한 날씨 시뮬레이터 데이터로 작동합니다.</p>
+                <div class="form-group">
+                    <label for="api-key-input">OpenWeatherMap API Key</label>
+                    <input type="password" id="api-key-input" placeholder="API Key를 입력하세요...">
+                </div>
+                <div class="api-status-row" id="api-status-message">
+                    <!-- API 상태 표시 -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="clear-api-key-btn">키 제거</button>
+                <button class="btn btn-primary" id="save-settings-btn">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='chartManager.js') }}"></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
