@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gravity Cash Dashboard</title>
+  <link rel="stylesheet" href="/static/app.css" />
+  <style>
+    /* Dark‑mode neon aesthetic */
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      font-family: "Inter", sans-serif;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container { max-width: 800px; margin: auto; }
+    h1 { color: #00ffff; text-shadow: 0 0 8px #00ffff; }
+    .input-area { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .input-area input {
+      flex: 1;
+      padding: 0.5rem 1rem;
+      background: #111;
+      border: 1px solid #333;
+      color: #fff;
+      border-radius: 4px;
+    }
+    .input-area button {
+      background: #00ffff;
+      border: none;
+      color: #000;
+      padding: 0.5rem 1rem;
+      font-weight: bold;
+      border-radius: 4px;
+      cursor: pointer;
+      box-shadow: 0 0 8px #00ffff;
+      transition: transform 0.1s;
+    }
+    .input-area button:hover { transform: scale(1.05); }
+    .records { display: grid; gap: 1rem; }
+    .card {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid #00ffff;
+      border-radius: 8px;
+      padding: 1rem;
+      color: #e0e0e0;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 0 12px #00ffff;
+    }
+    .card button {
+      background: transparent;
+      border: none;
+      color: #ff4d4d;
+      float: right;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Gravity Cash Dashboard</h1>
+    <div class="input-area">
+      <input type="text" id="dataInput" placeholder="Enter new record..." />
+      <button id="addBtn">Add</button>
+    </div>
+    <div class="records" id="recordsContainer"></div>
+  </div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

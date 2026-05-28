@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>바이브 코딩 — 감으로 만드는 시대</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Serif+KR:wght@300;400;700&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --cream:#f5f2eb;
+  --ink:#0f0e0c;
+  --lime:#b8ff00;
+  --lime-dim:#9ee000;
+  --rust:#c94f2a;
+  --mid:#6b6860;
+  --light:#e8e4da;
+  --border:rgba(15,14,12,0.12);
+}
+
+html{scroll-behavior:smooth}
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:'Noto Serif KR',serif;
+  font-weight:300;
+  overflow-x:hidden;
+  cursor:crosshair;
+}
+
+/* NOISE OVERLAY */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:.5;
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;width:100%;z-index:100;
+  display:grid;grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  padding:1.4rem 2.5rem;
+  border-bottom:1px solid var(--border);
+  background:rgba(245,242,235,0.92);
+  backdrop-filter:blur(16px);
+}
+.nav-left{
+  font-family:'DM Mono',monospace;
+  font-size:0.7rem;color:var(--mid);letter-spacing:0.15em;
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.6rem;letter-spacing:0.08em;
+  text-align:center;text-decoration:none;color:var(--ink);
+}
+.nav-right{display:flex;justify-content:flex-end;align-items:center;gap:1.5rem;}
+.nav-link{
+  font-family:'DM Mono',monospace;font-size:0.7rem;
+  color:var(--mid);text-decoration:none;letter-spacing:0.1em;
+  transition:color .2s;
+}
+.nav-link:hover{color:var(--ink);}
+.nav-btn{
+  font-family:'DM Mono',monospace;font-size:0.7rem;
+  background:var(--ink);color:var(--cream);
+  border:none;padding:.55rem 1.2rem;letter-spacing:0.1em;
+  cursor:crosshair;transition:background .2s;
+}
+.nav-btn:hover{background:var(--lime);color:var(--ink);}
+
+/* HERO */
+.hero{
+  min-height:100vh;
+  padding:9rem 2.5rem 5rem;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:4rem;
+  align-items:end;
+  border-bottom:1px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg-text{
+  position:absolute;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(16rem,28vw,32rem);
+  line-height:0.85;
+  color:transparent;
+  -webkit-text-stroke:1px rgba(15,14,12,0.06);
+  top:50%;left:50%;
+  transform:translate(-50%,-48%);
+  white-space:nowrap;
+  pointer-events:none;
+  user-select:none;
+  letter-spacing:-0.02em;
+}
+.hero-left{position:relative;}
+.hero-eyebrow{
+  display:flex;align-items:center;gap:0.8rem;
+  font-family:'DM Mono',monospace;
+  font-size:0.72rem;color:var(--mid);
+  letter-spacing:0.18em;margin-bottom:2rem;
+  animation:fadeSlideUp .7s both;
+}
+.eyebrow-dot{
+  width:8px;height:8px;background:var(--lime);
+  border-radius:50%;animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(184,255,0,.4)}50%{box-shadow:0 0 0 8px rgba(184,255,0,0)}}
+
+h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(5rem,11vw,11rem);
+  line-height:.9;
+  letter-spacing:-0.01em;
+  margin-bottom:2.5rem;
+  animation:fadeSlideUp .8s .1s both;
+}
+.h1-em{color:var(--lime);text-shadow:0 0 60px rgba(184,255,0,.3);}
+.h1-stroke{
+  color:transparent;
+  -webkit-text-stroke:2px var(--ink);
+}
+
+.hero-desc{
+  font-size:1.15rem;line-height:2;
+  color:var(--mid);max-width:480px;
+  margin-bottom:3rem;
+  animation:fadeSlideUp .8s .2s both;
+}
+.hero-desc strong{color:var(--ink);font-weight:700;}
+
+.hero-actions{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  animation:fadeSlideUp .8s .3s both;
+}
+.btn-primary{
+  font-family:'DM Mono',monospace;font-size:0.85rem;
+  background:var(--ink);color:var(--cream);
+  border:none;padding:1rem 2.2rem;
+  letter-spacing:0.08em;cursor:crosshair;
+  transition:all .2s;
+}
+.btn-primary:hover{background:var(--lime);color:var(--ink);transform:translateY(-2px);}
+.btn-ghost{
+  font-family:'DM Mono',monospace;font-size:0.85rem;
+  background:transparent;color:var(--mid);
+  border:1px solid var(--border);
+  padding:1rem 2.2rem;letter-spacing:0.08em;
+  cursor:crosshair;transition:all .2s;
+}
+.btn-ghost:hover{border-color:var(--ink);color:var(--ink);}
+
+.hero-right{
+  position:relative;
+  animation:fadeSlideUp .9s .2s both;
+}
+.terminal{
+  background:var(--ink);
+  border-radius:2px;
+  overflow:hidden;
+  font-family:'DM Mono',monospace;
+}
+.terminal-bar{
+  padding:.8rem 1.2rem;
+  background:#1a1916;
+  display:flex;align-items:center;gap:.5rem;
+  border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.t-dot{width:11px;height:11px;border-radius:50%;}
+.t-red{background:#ff5f57;}.t-yel{background:#febc2e;}.t-grn{background:#28c840;}
+.t-title{color:#666;font-size:0.72rem;letter-spacing:.1em;margin-left:.5rem;}
+.terminal-body{padding:1.8rem;font-size:.82rem;line-height:2.1;}
+.t-prompt{color:#555;}
+.t-cmd{color:#f5f2eb;}
+.t-comment{color:#4a4840;font-style:italic;}
+.t-lime{color:#b8ff00;}
+.t-blue{color:#79c0ff;}
+.t-orange{color:#ffa657;}
+.t-pink{color:#ff7b72;}
+.t-cursor{
+  display:inline-block;width:2px;height:1em;
+  background:var(--lime);vertical-align:text-bottom;
+  animation:blink 1s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+.hero-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:0;margin-top:2rem;
+  border:1px solid var(--border);
+  border-top:3px solid var(--lime);
+}
+.stat{
+  padding:1.5rem;
+  border-right:1px solid var(--border);
+  text-align:center;
+}
+.stat:last-child{border-right:none;}
+.stat-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.5rem;letter-spacing:.05em;
+  display:block;
+}
+.stat-label{
+  font-family:'DM Mono',monospace;
+  font-size:.67rem;color:var(--mid);
+  letter-spacing:.12em;
+}
+
+@keyframes fadeSlideUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* WHAT IS */
+.what-section{
+  display:grid;grid-template-columns:1fr 2fr;
+  border-bottom:1px solid var(--border);
+}
+.what-label{
+  padding:5rem 2.5rem;
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.vertical-text{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:4rem;
+  writing-mode:vertical-rl;
+  text-orientation:mixed;
+  letter-spacing:.08em;
+  color:var(--light);
+  user-select:none;
+}
+.section-num{
+  font-family:'DM Mono',monospace;
+  font-size:.7rem;color:var(--mid);letter-spacing:.15em;
+}
+.what-content{padding:5rem 3rem 5rem 4rem;}
+.what-content h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.5rem,5vw,4.5rem);
+  line-height:1;letter-spacing:.02em;
+  margin-bottom:2rem;
+}
+.highlight{
+  background:var(--lime);
+  color:var(--ink);
+  padding:0 .3em;
+}
+.what-body{
+  font-size:1.05rem;line-height:2.1;
+  color:var(--mid);max-width:580px;
+  margin-bottom:3rem;
+}
+.what-body p+p{margin-top:1.2rem;}
+.what-body strong{color:var(--ink);font-weight:700;}
+
+.quote-block{
+  border-left:3px solid var(--lime);
+  padding:1.2rem 1.8rem;
+  background:var(--light);
+  font-size:1.05rem;
+  font-style:italic;
+  line-height:1.8;
+  color:var(--ink);
+}
+
+/* HOW IT WORKS */
+.how-section{
+  padding:7rem 2.5rem;
+  border-bottom:1px solid var(--border);
+}
+.section-header{
+  display:flex;align-items:baseline;gap:2rem;
+  margin-bottom:5rem;
+}
+.section-header h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.5rem,5vw,4rem);
+  letter-spacing:.03em;
+}
+.section-header-sub{
+  font-family:'DM Mono',monospace;
+  font-size:.72rem;color:var(--mid);letter-spacing:.12em;
+}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);}
+.step{
+  background:var(--cream);
+  padding:3rem 2.5rem;
+  position:relative;
+  transition:background .3s;
+}
+.step:hover{background:var(--light);}
+.step-num{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:6rem;line-height:1;
+  color:var(--light);
+  margin-bottom:1rem;
+  transition:color .3s;
+}
+.step:hover .step-num{color:var(--lime);}
+.step-title{
+  font-size:1.3rem;font-weight:700;
+  margin-bottom:1rem;
+}
+.step-desc{font-size:.9rem;color:var(--mid);line-height:1.9;}
+.step-tag{
+  display:inline-block;margin-top:1.5rem;
+  font-family:'DM Mono',monospace;font-size:.68rem;
+  letter-spacing:.12em;color:var(--mid);
+  border:1px solid var(--border);padding:.35rem .8rem;
+}
+
+/* FEATURES */
+.features-section{
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+.features-top{
+  padding:7rem 2.5rem 4rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:end;
+}
+.features-top h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.5rem,5vw,4rem);letter-spacing:.03em;line-height:1;
+}
+.features-top p{font-size:1rem;color:var(--mid);line-height:2;}
+
+.feature-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;border-top:1px solid var(--border);
+}
+.feature{
+  padding:3rem 2rem;
+  border-right:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.feature:last-child{border-right:none;}
+.feature::before{
+  content:'';position:absolute;
+  top:0;left:0;right:0;height:2px;
+  background:var(--lime);
+  transform:scaleX(0);transform-origin:left;
+  transition:transform .4s;
+}
+.feature:hover::before{transform:scaleX(1);}
+.feature-icon{
+  font-size:2rem;margin-bottom:1.5rem;
+  display:block;
+}
+.feature-title{font-size:1rem;font-weight:700;margin-bottom:.8rem;}
+.feature-body{font-size:.88rem;color:var(--mid);line-height:1.9;}
+
+/* COMPARISON */
+.compare-section{
+  padding:7rem 2.5rem;
+  border-bottom:1px solid var(--border);
+}
+.compare-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:1px;background:var(--border);
+  margin-top:4rem;
+}
+.compare-col{padding:3rem;background:var(--cream);}
+.compare-col.new-way{background:var(--ink);color:var(--cream);}
+.compare-col-label{
+  font-family:'DM Mono',monospace;font-size:.72rem;
+  letter-spacing:.18em;color:var(--mid);
+  margin-bottom:2rem;
+}
+.compare-col.new-way .compare-col-label{color:rgba(245,242,235,.4);}
+.compare-col-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:2.5rem;letter-spacing:.05em;
+  margin-bottom:2.5rem;
+}
+.compare-col.new-way .compare-col-title{color:var(--lime);}
+.compare-items{list-style:none;display:flex;flex-direction:column;gap:.8rem;}
+.compare-item{
+  display:flex;align-items:flex-start;gap:.8rem;
+  font-size:.95rem;line-height:1.7;
+}
+.ci-icon{
+  font-family:'DM Mono',monospace;font-size:.75rem;
+  padding:.2rem .5rem;margin-top:.1rem;flex-shrink:0;
+}
+.old-way .ci-icon{background:rgba(201,79,42,.15);color:var(--rust);}
+.new-way .ci-icon{background:rgba(184,255,0,.15);color:var(--lime);}
+
+/* TESTIMONIALS */
+.testi-section{
+  padding:7rem 2.5rem;
+  border-bottom:1px solid var(--border);
+}
+.testi-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:2rem;margin-top:4rem;
+}
+.testi-card{
+  border:1px solid var(--border);
+  padding:2.5rem;position:relative;
+}
+.testi-card::before{
+  content:'"';
+  font-family:'Bebas Neue',sans-serif;
+  font-size:6rem;line-height:.7;
+  color:var(--lime);
+  position:absolute;top:1rem;right:1.5rem;
+  opacity:.3;
+}
+.testi-text{
+  font-size:1rem;line-height:2;
+  margin-bottom:2rem;
+  color:var(--ink);
+}
+.testi-text strong{color:var(--rust);}
+.testi-author{
+  display:flex;align-items:center;gap:1rem;
+  padding-top:1.5rem;
+  border-top:1px solid var(--border);
+}
+.testi-avatar{
+  width:42px;height:42px;
+  background:var(--light);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Mono',monospace;
+  font-size:.75rem;font-weight:500;
+  border:1px solid var(--border);flex-shrink:0;
+}
+.testi-name{font-size:.9rem;font-weight:700;}
+.testi-role{font-size:.78rem;color:var(--mid);font-family:'DM Mono',monospace;letter-spacing:.05em;}
+
+/* PRICING */
+.pricing-section{
+  padding:7rem 2.5rem;
+  border-bottom:1px solid var(--border);
+}
+.pricing-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--border);
+  margin-top:4rem;
+}
+.plan{background:var(--cream);padding:3rem 2.5rem;position:relative;}
+.plan.featured{
+  background:var(--ink);color:var(--cream);
+  outline:2px solid var(--lime);outline-offset:-1px;
+}
+.plan-badge{
+  font-family:'DM Mono',monospace;font-size:.65rem;
+  letter-spacing:.18em;background:var(--lime);
+  color:var(--ink);padding:.3rem .8rem;
+  display:inline-block;margin-bottom:1.5rem;
+}
+.plan-name{
+  font-family:'DM Mono',monospace;font-size:.75rem;
+  letter-spacing:.15em;color:var(--mid);
+  margin-bottom:.8rem;
+}
+.plan.featured .plan-name{color:rgba(245,242,235,.5);}
+.plan-price{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:4rem;line-height:1;
+  margin-bottom:.3rem;
+}
+.plan.featured .plan-price{color:var(--lime);}
+.plan-period{font-size:.82rem;color:var(--mid);margin-bottom:2.5rem;}
+.plan.featured .plan-period{color:rgba(245,242,235,.4);}
+.plan-list{list-style:none;display:flex;flex-direction:column;gap:.7rem;margin-bottom:2.5rem;}
+.plan-list li{
+  font-size:.88rem;line-height:1.7;
+  display:flex;align-items:flex-start;gap:.7rem;
+  color:var(--mid);
+}
+.plan.featured .plan-list li{color:rgba(245,242,235,.7);}
+.plan-list li::before{
+  content:'↗';color:var(--lime);
+  font-family:'DM Mono',monospace;font-size:.75rem;
+  flex-shrink:0;
+}
+
+/* CTA SECTION */
+.cta-section{
+  position:relative;overflow:hidden;
+  background:var(--ink);
+  padding:10rem 2.5rem;
+  text-align:center;
+}
+.cta-bg-text{
+  position:absolute;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(12rem,22vw,26rem);
+  line-height:1;
+  color:transparent;
+  -webkit-text-stroke:1px rgba(184,255,0,.08);
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  white-space:nowrap;
+  pointer-events:none;letter-spacing:-.02em;
+}
+.cta-section h2{
+  position:relative;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3rem,7vw,7rem);
+  color:var(--cream);
+  letter-spacing:.02em;
+  margin-bottom:1.5rem;
+}
+.cta-section h2 em{color:var(--lime);font-style:normal;}
+.cta-desc{
+  position:relative;
+  font-size:1.1rem;color:rgba(245,242,235,.5);
+  max-width:480px;margin:0 auto 3rem;line-height:1.9;
+}
+.cta-actions{position:relative;display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+
+/* FOOTER */
+footer{
+  border-top:1px solid var(--border);
+  padding:3rem 2.5rem;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:1.5rem;letter-spacing:.08em;
+}
+.footer-copy{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--mid);letter-spacing:.1em;}
+.footer-links{display:flex;gap:2rem;}
+.footer-links a{
+  font-family:'DM Mono',monospace;font-size:.68rem;
+  color:var(--mid);text-decoration:none;letter-spacing:.08em;
+  transition:color .2s;
+}
+.footer-links a:hover{color:var(--ink);}
+
+/* MARQUEE */
+.marquee-wrap{
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+  padding:.9rem 0;overflow:hidden;
+  background:var(--lime);
+}
+.marquee-track{
+  display:flex;gap:4rem;
+  animation:slide 18s linear infinite;
+  width:max-content;
+}
+@keyframes slide{to{transform:translateX(-50%)}}
+.marquee-item{
+  font-family:'DM Mono',monospace;font-size:.75rem;
+  letter-spacing:.18em;color:var(--ink);
+  display:flex;align-items:center;gap:2rem;white-space:nowrap;
+}
+.marquee-dot{width:5px;height:5px;background:var(--ink);border-radius:50%;}
+
+/* SCROLL ANIMATIONS */
+.reveal{opacity:0;transform:translateY(32px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding:7rem 1.5rem 4rem;}
+  .what-section{grid-template-columns:1fr;}
+  .what-label{display:none;}
+  .what-content{padding:4rem 1.5rem;}
+  .steps{grid-template-columns:1fr;}
+  .feature-grid{grid-template-columns:1fr 1fr;}
+  .compare-grid{grid-template-columns:1fr;}
+  .testi-grid{grid-template-columns:1fr;}
+  .pricing-grid{grid-template-columns:1fr;}
+  nav{grid-template-columns:1fr auto;}
+  .nav-right{display:none;}
+  .hero-bg-text{font-size:40vw;}
+  footer{flex-direction:column;gap:1.5rem;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">v2025.04</div>
+  <a class="nav-logo" href="#">VIBE CODING</a>
+  <div class="nav-right">
+    <a class="nav-link" href="#what">소개</a>
+    <a class="nav-link" href="#how">방법</a>
+    <a class="nav-link" href="#features">기능</a>
+    <a class="nav-link" href="#pricing">요금제</a>
+    <button class="nav-btn">무료 시작 →</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">VIBE</div>
+
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <div class="eyebrow-dot"></div>
+      AI 코딩의 새로운 패러다임 · 2025
+    </div>
+    <h1>
+      <span class="h1-stroke">코드</span><br>
+      몰라도<br>
+      <span class="h1-em">괜찮아</span>
+    </h1>
+    <p class="hero-desc">
+      <strong>바이브 코딩(Vibe Coding)</strong>은 AI에게 원하는 것을 말로 설명하고,<br>
+      결과물을 느낌으로 판단하며 만들어가는 새로운 개발 방식입니다.<br>
+      문법보다 감각, 로직보다 방향이 먼저입니다.
+    </p>
+    <div class="hero-actions">
+      <button class="btn-primary">지금 체험하기 →</button>
+      <button class="btn-ghost">동작 방식 보기</button>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="terminal">
+      <div class="terminal-bar">
+        <div class="t-dot t-red"></div>
+        <div class="t-dot t-yel"></div>
+        <div class="t-dot t-grn"></div>
+        <span class="t-title">vibe-session.sh</span>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-prompt">$ </span><span class="t-cmd">vibe start "따뜻한 카페 예약 앱"</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-lime">✓</span> <span class="t-comment">프로젝트 구조 생성 중...</span></div>
+        <div><span class="t-lime">✓</span> <span class="t-comment">디자인 시스템 적용: warm-cream</span></div>
+        <div><span class="t-lime">✓</span> <span class="t-comment">예약 로직 작성 완료</span></div>
+        <div><span class="t-lime">✓</span> <span class="t-comment">반응형 UI 생성</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-prompt">$ </span><span class="t-cmd">vibe refine "버튼 더 둥글게, 폰트 크게"</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-lime">✓</span> <span class="t-comment">스타일 업데이트 완료 (2.1s)</span></div>
+        <div>&nbsp;</div>
+        <div><span class="t-prompt">$ </span><span class="t-cmd">vibe deploy<span class="t-cursor"></span></span></div>
+      </div>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat">
+        <span class="stat-num">10×</span>
+        <span class="stat-label">빠른 개발</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">0줄</span>
+        <span class="stat-label">필수 코드</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">가능성</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item">VIBE CODING <div class="marquee-dot"></div></div>
+    <div class="marquee-item">AI 퍼스트 개발 <div class="marquee-dot"></div></div>
+    <div class="marquee-item">말로 만드는 앱 <div class="marquee-dot"></div></div>
+    <div class="marquee-item">코드 없이 런칭 <div class="marquee-dot"></div></div>
+    <div class="marquee-item">감각적인 개발 <div class="marquee-dot"></div></div>
+    <div class="marquee-item">VIBE CODING <div class="marquee-dot"></div></div>
+    <div class="marquee-item">AI 퍼스트 개발 <div class="marquee-dot"></div></div>
+    <div class="marquee-item">말로 만드는 앱 <div class="marquee-dot"></div></div>
+    <div class="marquee-item">코드 없이 런칭 <div class="marquee-dot"></div></div>
+    <div class="marquee-item">감각적인 개발 <div class="marquee-dot"></div></div>
+  </div>
+</div>
+
+<!-- WHAT IS VIBE CODING -->
+<section class="what-section" id="what">
+  <div class="what-label">
+    <div class="section-num">01 / 소개</div>
+    <div class="vertical-text">WHAT</div>
+  </div>
+  <div class="what-content reveal">
+    <h2>바이브 코딩이란<br><span class="highlight">무엇인가?</span></h2>
+    <div class="what-body">
+      <p>
+        2025년 2월, OpenAI의 공동창업자 <strong>안드레이 카르파티(Andrej Karpathy)</strong>가 처음 제시한 개념입니다. 그는 "나는 완전히 바이브에 몸을 맡기고, 코드를 거의 보지 않으며, AI가 뭔가 잘못됐다고 말할 때조차 그냥 시도해본다"라고 말했습니다.
+      </p>
+      <p>
+        전통적인 개발은 <strong>언어를 배우고 → 로직을 설계하고 → 코드를 직접 짜는</strong> 방식입니다. 바이브 코딩은 반대입니다. 원하는 것을 자연어로 말하고, AI가 만든 결과물을 보고 느낌으로 피드백하며 완성해나갑니다.
+      </p>
+      <p>
+        개발자의 역할이 바뀝니다. 타이피스트가 아닌 <strong>감독</strong>이 됩니다.
+      </p>
+    </div>
+    <div class="quote-block">
+      "코드를 작성하는 것이 아니라, 원하는 것을 말하는 시대가 왔다.<br>
+      바이브 코딩은 창의성과 기술 사이의 장벽을 허문다."
+      <br><br>— Andrej Karpathy, 2025
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-header reveal">
+    <h2>어떻게 동작하나</h2>
+    <span class="section-header-sub">02 / HOW IT WORKS</span>
+  </div>
+  <div class="steps">
+    <div class="step reveal">
+      <div class="step-num">01</div>
+      <div class="step-title">말로 설명하기</div>
+      <p class="step-desc">
+        만들고 싶은 것을 일상 언어로 설명합니다. "따뜻한 느낌의 카페 예약 앱", "미니멀한 포트폴리오 사이트"처럼 느낌과 목적을 자유롭게 표현하세요.
+      </p>
+      <div class="step-tag">NATURAL LANGUAGE</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">02</div>
+      <div class="step-title">AI가 만들기</div>
+      <p class="step-desc">
+        AI가 설명을 해석해 코드, 디자인, 구조를 생성합니다. 수십 초 안에 실제로 작동하는 결과물이 나옵니다. 코드를 이해할 필요가 없습니다.
+      </p>
+      <div class="step-tag">AI GENERATION</div>
+    </div>
+    <div class="step reveal">
+      <div class="step-num">03</div>
+      <div class="step-title">느낌으로 수정</div>
+      <p class="step-desc">
+        결과물을 보고 느낌으로 피드백합니다. "더 밝게", "버튼 크게", "딱딱한 느낌 줄여줘" — 감각적 언어가 그대로 변경사항이 됩니다.
+      </p>
+      <div class="step-tag">VIBE FEEDBACK</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="features-top reveal">
+    <h2>바이브 코딩의<br>핵심 특징</h2>
+    <p>기술적 배경 없이도 아이디어를 현실로 만들 수 있습니다. 중요한 것은 무엇을 만들고 싶은지 아는 것, 그뿐입니다.</p>
+  </div>
+  <div class="feature-grid">
+    <div class="feature reveal">
+      <span class="feature-icon">💬</span>
+      <div class="feature-title">자연어 인터페이스</div>
+      <p class="feature-body">코드 대신 말로 명령합니다. 한국어, 영어 모두 가능. AI가 의도를 파악해 실행합니다.</p>
+    </div>
+    <div class="feature reveal">
+      <span class="feature-icon">⚡</span>
+      <div class="feature-title">즉각적인 결과</div>
+      <p class="feature-body">명령에서 결과까지 수십 초. 아이디어 → 프로토타입 사이클이 극적으로 단축됩니다.</p>
+    </div>
+    <div class="feature reveal">
+      <span class="feature-icon">🎨</span>
+      <div class="feature-title">감각적 피드백 루프</div>
+      <p class="feature-body">"이상해", "딱딱해", "더 가볍게" 같은 표현이 실제 수정으로 이어집니다. 느낌이 명령입니다.</p>
+    </div>
+    <div class="feature reveal">
+      <span class="feature-icon">🚀</span>
+      <div class="feature-title">원클릭 배포</div>
+      <p class="feature-body">만족스러운 결과물은 즉시 배포. 서버 설정, 도메인 연결 모두 자동으로 처리됩니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="compare-section">
+  <div class="section-header reveal">
+    <h2>기존 방식 vs 바이브 코딩</h2>
+    <span class="section-header-sub">03 / COMPARISON</span>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-col old-way reveal">
+      <div class="compare-col-label">BEFORE · 기존 개발</div>
+      <div class="compare-col-title">코드를 짠다</div>
+      <ul class="compare-items">
+        <li class="compare-item"><span class="ci-icon">✕</span>언어 문법을 배워야 한다</li>
+        <li class="compare-item"><span class="ci-icon">✕</span>개발 환경 세팅에 시간 소요</li>
+        <li class="compare-item"><span class="ci-icon">✕</span>에러 디버깅에 수 시간 투자</li>
+        <li class="compare-item"><span class="ci-icon">✕</span>아이디어에서 결과까지 수 주</li>
+        <li class="compare-item"><span class="ci-icon">✕</span>디자인은 별도 전문가 필요</li>
+        <li class="compare-item"><span class="ci-icon">✕</span>배포 과정이 복잡하고 어렵다</li>
+      </ul>
+    </div>
+    <div class="compare-col new-way reveal">
+      <div class="compare-col-label">AFTER · 바이브 코딩</div>
+      <div class="compare-col-title">감으로 만든다</div>
+      <ul class="compare-items">
+        <li class="compare-item"><span class="ci-icon">✓</span>자연어로 설명하면 끝</li>
+        <li class="compare-item"><span class="ci-icon">✓</span>별도 설정 없이 즉시 시작</li>
+        <li class="compare-item"><span class="ci-icon">✓</span>"다시 해줘" 한 마디로 해결</li>
+        <li class="compare-item"><span class="ci-icon">✓</span>아이디어에서 결과까지 수 분</li>
+        <li class="compare-item"><span class="ci-icon">✓</span>느낌만 말하면 AI가 디자인</li>
+        <li class="compare-item"><span class="ci-icon">✓</span>원클릭으로 전 세계에 배포</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testi-section" id="reviews">
+  <div class="section-header reveal">
+    <h2>사용자 이야기</h2>
+    <span class="section-header-sub">04 / TESTIMONIALS</span>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <p class="testi-text">
+        개발자 없이 창업하는 게 꿈이었어요. 바이브 코딩 덕분에 <strong>혼자서 3일 만에</strong> 서비스를 런칭했습니다. 코드 한 줄도 몰라도 됩니다.
+      </p>
+      <div class="testi-author">
+        <div class="testi-avatar">김지</div>
+        <div>
+          <div class="testi-name">김지연</div>
+          <div class="testi-role">스타트업 창업자 · 서울</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <p class="testi-text">
+        디자이너인데 이제 <strong>직접 프론트엔드를 만듭니다</strong>. 개발자에게 설명하는 시간이 사라지고, 내 감각대로 즉시 구현됩니다. 혁명입니다.
+      </p>
+      <div class="testi-author">
+        <div class="testi-avatar">박민</div>
+        <div>
+          <div class="testi-name">박민준</div>
+          <div class="testi-role">UX 디자이너 · 부산</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <p class="testi-text">
+        프로토타입 만드는 속도가 <strong>10배 이상 빨라졌어요</strong>. 클라이언트 미팅 전날에 아이디어를 받아도 다음 날 시연할 수 있습니다.
+      </p>
+      <div class="testi-author">
+        <div class="testi-avatar">이수</div>
+        <div>
+          <div class="testi-name">이수빈</div>
+          <div class="testi-role">프리랜서 기획자 · 대구</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing-section" id="pricing">
+  <div class="section-header reveal">
+    <h2>요금제</h2>
+    <span class="section-header-sub">05 / PRICING</span>
+  </div>
+  <div class="pricing-grid">
+    <div class="plan reveal">
+      <div class="plan-name">STARTER</div>
+      <div class="plan-price">무료</div>
+      <div class="plan-period">영원히 무료</div>
+      <ul class="plan-list">
+        <li>월 10개 프로젝트</li>
+        <li>기본 AI 모델 사용</li>
+        <li>커뮤니티 지원</li>
+        <li>vibe.dev 서브도메인</li>
+      </ul>
+      <button class="btn-ghost" style="width:100%">무료로 시작 →</button>
+    </div>
+    <div class="plan featured reveal">
+      <div class="plan-badge">가장 인기</div>
+      <div class="plan-name">PRO</div>
+      <div class="plan-price"><sup>₩</sup>29,000</div>
+      <div class="plan-period">/ 월 · 연간 결제 시 20% 할인</div>
+      <ul class="plan-list">
+        <li>무제한 프로젝트</li>
+        <li>최신 AI 모델 (GPT-4o, Claude)</li>
+        <li>커스텀 도메인 연결</li>
+        <li>우선 지원</li>
+        <li>팀 협업 기능</li>
+      </ul>
+      <button class="btn-primary" style="width:100%;justify-content:center">Pro 시작 →</button>
+    </div>
+    <div class="plan reveal">
+      <div class="plan-name">ENTERPRISE</div>
+      <div class="plan-price">문의</div>
+      <div class="plan-period">맞춤 견적</div>
+      <ul class="plan-list">
+        <li>전용 AI 인프라</li>
+        <li>온프레미스 배포 지원</li>
+        <li>SSO / 보안 감사</li>
+        <li>전담 매니저</li>
+        <li>SLA 보장</li>
+      </ul>
+      <button class="btn-ghost" style="width:100%">영업팀 문의 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="cta-bg-text">START</div>
+  <h2 class="reveal">지금 바로<br><em>느껴보세요</em></h2>
+  <p class="cta-desc reveal">신용카드 불필요. 5분 안에 첫 앱을 만들 수 있습니다.<br>코드 경험? 필요 없습니다. 아이디어만 있으면 됩니다.</p>
+  <div class="cta-actions reveal">
+    <button class="btn-primary" style="font-size:1rem;padding:1.2rem 2.8rem;">무료로 시작하기 →</button>
+    <button class="btn-ghost" style="font-size:1rem;padding:1.2rem 2.8rem;border-color:rgba(245,242,235,0.2);color:rgba(245,242,235,0.5)">데모 영상 보기</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">VIBE CODING</div>
+  <div class="footer-copy">© 2025 VIBE CODING. ALL RIGHTS RESERVED.</div>
+  <div class="footer-links">
+    <a href="#">개인정보처리방침</a>
+    <a href="#">이용약관</a>
+    <a href="#">문의하기</a>
+  </div>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('visible'); } });
+}, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
