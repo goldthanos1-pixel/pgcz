@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 4대 자산 인사이트</title>
+    <!-- Google Fonts Outfit & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --background: #090d16;
+            --foreground: #f8fafc;
+            --cyan-neon: #00f0ff;
+            --pink-neon: #ff007f;
+            --green-neon: #39ff14;
+            --yellow-neon: #ffea00;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--foreground);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-col: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--cyan-neon);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        main {
+            width: 100%;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+        }
+
+        @media (max-width: 600px) {
+            main {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Neon categories styling */
+        .card.economy { border-left: 4px solid var(--cyan-neon); }
+        .card.estate { border-left: 4px solid var(--pink-neon); }
+        .card.stock { border-left: 4px solid var(--green-neon); }
+        .card.coin { border-left: 4px solid var(--yellow-neon); }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .category-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .economy .category-title { color: var(--cyan-neon); }
+        .estate .category-title { color: var(--pink-neon); }
+        .stock .category-title { color: var(--green-neon); }
+        .coin .category-title { color: var(--yellow-neon); }
+
+        .insight-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+            padding: 1.2rem;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+        }
+
+        .news-section h4 {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #64748b;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+        }
+
+        .news-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .news-item a {
+            display: block;
+            font-size: 0.85rem;
+            color: #e2e8f0;
+            text-decoration: none;
+            line-height: 1.4;
+            transition: color 0.2s ease;
+        }
+
+        .news-item a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50vh;
+            width: 100%;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border-left-color: var(--cyan-neon);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌌 Insight Monitor</h1>
+        <div class="subtitle">Real-time Korean Asset Trends</div>
+    </header>
+
+    <div id="loading" class="loading-container">
+        <div class="spinner"></div>
+    </div>
+
+    <main id="content" style="display: none;">
+        <!-- Card 1: Economy -->
+        <div class="card economy">
+            <div>
+                <div class="category-header">
+                    <span class="category-title">Economy</span>
+                    <span>📈</span>
+                </div>
+                <div class="insight-box" id="economy-insight">로딩 중...</div>
+            </div>
+            <div class="news-section">
+                <h4>Today's News</h4>
+                <ul class="news-list" id="economy-news"></ul>
+            </div>
+        </div>
+
+        <!-- Card 2: Estate -->
+        <div class="card estate">
+            <div>
+                <div class="category-header">
+                    <span class="category-title">Real Estate</span>
+                    <span>🏢</span>
+                </div>
+                <div class="insight-box" id="estate-insight">로딩 중...</div>
+            </div>
+            <div class="news-section">
+                <h4>Today's News</h4>
+                <ul class="news-list" id="estate-news"></ul>
+            </div>
+        </div>
+
+        <!-- Card 3: Stock -->
+        <div class="card stock">
+            <div>
+                <div class="category-header">
+                    <span class="category-title">Stocks</span>
+                    <span>📊</span>
+                </div>
+                <div class="insight-box" id="stock-insight">로딩 중...</div>
+            </div>
+            <div class="news-section">
+                <h4>Today's News</h4>
+                <ul class="news-list" id="stock-news"></ul>
+            </div>
+        </div>
+
+        <!-- Card 4: Crypto -->
+        <div class="card coin">
+            <div>
+                <div class="category-header">
+                    <span class="category-title">Cryptocurrency</span>
+                    <span>🪙</span>
+                </div>
+                <div class="insight-box" id="coin-insight">로딩 중...</div>
+            </div>
+            <div class="news-section">
+                <h4>Today's News</h4>
+                <ul class="news-list" id="coin-news"></ul>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch("/api/insights")
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("loading").style.display = "none";
+                    document.getElementById("content").style.display = "grid";
+
+                    // Update Insights & Articles
+                    const categories = ["economy", "estate", "stock", "coin"];
+                    categories.forEach(cat => {
+                        document.getElementById(`${cat}-insight`).textContent = data[cat].insight;
+                        
+                        const list = document.getElementById(`${cat}-news`);
+                        list.innerHTML = "";
+                        data[cat].articles.forEach(art => {
+                            const li = document.createElement("li");
+                            li.className = "news-item";
+                            li.innerHTML = `<a href="${art.link}" target="_blank">🔗 ${art.title}</a>`;
+                            list.appendChild(li);
+                        });
+                    });
+                })
+                .catch(err => {
+                    console.error("Error loading insights:", err);
+                    document.getElementById("loading").innerHTML = "<p style='color: var(--pink-neon); font-weight: bold;'>인사이트 로딩에 실패했습니다.</p>";
+                });
+        });
+    </script>
+</body>
+</html>
